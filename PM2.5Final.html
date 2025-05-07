@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>PM2.5 in the Atmosphere</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">PM2.5 in the Atmosphere</h1>
+</header>
+<p>```{r setup, include=FALSE} knitr::opts_chunk$set(echo = FALSE)
+library(flexdashboard) library(tidyverse) library(plotly) library(DT)
+library(dplyr) library(ggplot2)</p>
+<p>pm2516&lt;-read_csv(“PM2.5_2016.csv”) %&gt;% mutate(Year = “2016”)
+pm2517&lt;-read_csv(“PM2.5_2017.csv”) %&gt;% mutate(Year = “2017”)
+pm2518&lt;-read_csv(“PM2.5_2018.csv”) %&gt;% mutate(Year = “2018”)
+pm2519&lt;-read_csv(“PM2.5_2019.csv”) %&gt;% mutate(Year = “2019”)
+pm2520&lt;-read_csv(“PM2.5_2020.csv”) %&gt;% mutate(Year = “2020”)
+pm2521&lt;-read_csv(“PM2.5_2021.csv”) %&gt;% mutate(Year = “2021”)
+pm2522&lt;-read_csv(“PM2.5_2022.csv”) %&gt;% mutate(Year = “2022”)
+pm2523&lt;-read_csv(“PM2.5_2023.csv”) %&gt;% mutate(Year = “2023”)
+pm2524&lt;-read_csv(“PM2.5_2024.csv”) %&gt;% mutate(Year = “2024”)</p>
+<p>pm2516&lt;-select(pm2516,-‘County FIPS Code’)
+pm2517&lt;-select(pm2517,-‘County FIPS Code’)
+pm2518&lt;-select(pm2518,-‘County FIPS Code’)
+pm2519&lt;-select(pm2519,-‘County FIPS Code’)
+pm2520&lt;-select(pm2520,-‘County FIPS Code’)
+pm2521&lt;-select(pm2521,-‘County FIPS Code’)
+pm2522&lt;-select(pm2522,-‘County FIPS Code’)
+pm2523&lt;-select(pm2523,-‘County FIPS Code’)
+pm2524&lt;-select(pm2524,-‘County FIPS Code’)</p>
+<p>tempall&lt;-read_csv(“dayton_temperature.csv”) temp&lt;-tempall%&gt;%
+filter(yr %in% c(2016:2024))
+precall&lt;-read_csv(“dayton_precipitation.csv”) prec&lt;-precall%&gt;%
+filter(yr %in% c(2016:2024))</p>
+<p>PM25&lt;-bind_rows(pm2516,pm2517,pm2518,pm2519,pm2520,pm2521,pm2522,pm2523,pm2524)</p>
+<p>colnpm&lt;-colnames(pm2516) colntemp&lt;-colnames(temp)
+colnprec&lt;-colnames(prec)</p>
+<pre><code>
+Overview
+===
+
+Column {data-width=550}
+---
+###
+This project explores the impact of &lt;span Style=&quot;color:#854798&quot;&gt;the Covid-19 pandemic, Cyclical Changes, and Location&lt;/span&gt; on PM2.5 air pollution levels in the &lt;span Style=&quot;color:#854798&quot;&gt;atmosphere&lt;/span&gt;, over the period from &lt;span Style=&quot;color:#854798&quot;&gt;2016 to 2024&lt;/span&gt;. PM2.5 refers to fine particulate matter that can pose significant health risks due to its ability to penetrate deep into the lungs and bloodstream. 
+
+The COVID-19 pandemic, particularly during its early stages, led to widespread &lt;span Style=&quot;color:#854798&quot;&gt;shutdowns&lt;/span&gt; and &lt;span Style=&quot;color:#854798&quot;&gt;reduced human activity&lt;/span&gt;, which may have influenced local air quality. By analyzing PM2.5 data across this time span, this study aims to identify any notable changes in pollution levels during the pandemic years. 
+
+The project will also investigate whether &lt;span Style=&quot;color:#854798&quot;&gt;seasonal or cyclical patterns&lt;/span&gt; exist in PM2.5 concentrations, providing a broader understanding of how air quality in Dayton fluctuates throughout the year.
+
+&lt;span Style=&quot;color:#854798&quot;&gt;Temperature and Precipitation&lt;/span&gt; are theorized to affect the PM2.5 concentration. This project will look at the monthly &lt;span Style=&quot;color:#854798&quot;&gt;average temperative and precipitation&lt;/span&gt; in relation to PM2.5 to see whether there is an effect on the average PM2.5 concentration.
+
+
+Comlumn {data-width=450}
+---
+```{r}
+knitr::include_graphics(&quot;PM25.png&quot;)</code></pre>
+<h1 id="data">Data</h1>
+<h2 class="tabset" data-width="350" id="column">Column</h2>
+<h3 id="description">Description</h3>
+<p>Here is the data that I will be using to answer my questions about PM
+2.5 particles in the air. I got these data values from the <span
+style="color:#854798">United States Environmental Protection
+Agency</span> site. These datasets show the daily mean PM2.5
+concentration at the measurement site. There is one data set for each
+year from 2016 to 2024.</p>
+<p>I obtained the Temperature and Precipitation data from <span
+style="color:#854798">Dr. Shuang-ye Wu</span>. A climatology professor
+here at the University of Dayton.</p>
+<h3 id="variables-pm2.5">Variables (PM2.5)</h3>
+<ul>
+<li><span style="color:#854798">Date</span>: Date</li>
+<li><span style="color:#854798">Source</span>: Source of
+Measurement</li>
+<li><span style="color:#854798">Site ID</span>: Site ID of Source</li>
+<li><span style="color:#854798">POC</span>: Parameter Occurrence
+Code</li>
+<li><span style="color:#854798">Daily Mean PM2.5 Concentration</span>:
+Daily Mean PM2.5 Concentration</li>
+<li><span style="color:#854798">Units</span>: Units of Measurement</li>
+<li><span style="color:#854798">Daily AQI Value</span>: Daily Air
+Quality Index Value</li>
+<li><span style="color:#854798">Daily Obs Count</span>: Daily
+Observation Count</li>
+<li><span style="color:#854798">Percent Complete</span>: Percent
+Complete</li>
+<li><span style="color:#854798">AQS Parameter Code</span>: Air Quality
+System Parameter Code</li>
+<li><span style="color:#854798">AQS Parameter Description</span>: Air
+Quality System Parameter Description</li>
+<li><span style="color:#854798">Method Code</span>: Method Code</li>
+<li><span style="color:#854798">Method Description</span>: Method
+Description</li>
+<li><span style="color:#854798">CBSA Code</span>: Core Based Statistical
+Area Code</li>
+<li><span style="color:#854798">CBSA Name</span>: Core Based Statistical
+Area Name</li>
+<li><span style="color:#854798">State FIPS Code</span>: Federal
+Information Processing System</li>
+<li><span style="color:#854798">State</span>: State</li>
+<li><span style="color:#854798">County</span>: County</li>
+<li><span style="color:#854798">Site Latitude</span>: Site Latitude</li>
+<li><span style="color:#854798">Site Longitude</span>: Site
+Longitude</li>
+<li><span style="color:#854798">Year</span>: Year</li>
+</ul>
+<h3 id="variables-weather">Variables (Weather)</h3>
+<ul>
+<li><span style="color:#854798">yr</span>: Year</li>
+<li><span style="color:#854798">mon</span>: Month</li>
+<li><span style="color:#854798">temp</span>: Temperature in 1/100th of
+Celcius</li>
+<li><span style="color:#854798">prv</span>: Precipitation in
+Micrometers</li>
+</ul>
+<h2 class="tabset" data-width="550" id="column-1">Column</h2>
+<h3 id="section">2016</h3>
+<pre class="{r}"><code>datatable(pm2516[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-1">2017</h3>
+<pre class="{r}"><code>datatable(pm2517[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-2">2018</h3>
+<pre class="{r}"><code>datatable(pm2518[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-3">2019</h3>
+<pre class="{r}"><code>datatable(pm2519[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-4">2020</h3>
+<pre class="{r}"><code>datatable(pm2520[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-5">2021</h3>
+<pre class="{r}"><code>datatable(pm2521[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-6">2022</h3>
+<pre class="{r}"><code>datatable(pm2522[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-7">2023</h3>
+<pre class="{r}"><code>datatable(pm2523[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="section-8">2024</h3>
+<pre class="{r}"><code>datatable(pm2524[1:500,],rownames = F, colnames = colnpm, options = list(pageLength = 20))</code></pre>
+<h3 id="temperature">Temperature</h3>
+<pre class="{r}"><code>datatable(temp[1:100,],rownames = F, colnames = colntemp, options = list(pageLength = 20))</code></pre>
+<h3 id="precipitation">Precipitation</h3>
+<pre class="{r}"><code>datatable(prec[1:100,],rownames = F, colnames = colnprec, options = list(pageLength = 20))</code></pre>
+<h1 id="yearly-averages">Yearly Averages</h1>
+<h2 id="column-data-width-300">Column {Data-width = 300}</h2>
+<h3 id="analysis">Analysis</h3>
+<p>The yearly average <span style="color:#854798">went down</span>
+during the year 2020, but during the following years, the yearly means
+fluctuate a lot more. This shows that there is <span
+style="color:#854798">no correlation</span> between the yearly average
+of PM 2.5 and the time during the Covid 19 pandemic.</p>
+<p>Here is a scatterplot of the <span style="color:#854798">yearly
+averages</span>.</p>
+<h2 id="column-data-width-700">Column {Data-width = 700}</h2>
+<h3 id="section-9"></h3>
+<pre class="{r}"><code>PM25mean&lt;-c(mean(pm2516$`Daily Mean PM2.5 Concentration`),mean(pm2517$`Daily Mean PM2.5 Concentration`),mean(pm2518$`Daily Mean PM2.5 Concentration`),mean(pm2519$`Daily Mean PM2.5 Concentration`),mean(pm2520$`Daily Mean PM2.5 Concentration`),mean(pm2521$`Daily Mean PM2.5 Concentration`),mean(pm2522$`Daily Mean PM2.5 Concentration`),mean(pm2523$`Daily Mean PM2.5 Concentration`),mean(pm2524$`Daily Mean PM2.5 Concentration`))
+Year&lt;-c(2016:2024)
+PM25m&lt;-data.frame(year = Year, mean = PM25mean)
+
+ggplot(PM25m,aes(x=year,y=mean))+
+  geom_point(fill=&quot;tan1&quot;,color=&quot;sienna4&quot;)+
+  labs(y = &quot;Yearly Mean&quot;,x=&quot;Year&quot;)+
+  coord_cartesian(ylim = c(min(PM25mean),max(PM25mean)))
+</code></pre>
+<h1 id="cyclical-changes">Cyclical Changes</h1>
+<h2 id="column-data-width-300-1">Column {data-width = 300}</h2>
+<h3 id="analysis-1">Analysis</h3>
+<p>Here is a graph showing the <span style="color:#854798">monthly
+average PM2.5 concentrations</span> throughout the years. The x axis
+indicates the <span style="color:#854798">month</span>. (January=1,
+February=2, March=3, etc.) The y axis indicates the <span
+style="color:#854798">monthly average PM2.5 concentrations</span>. The
+color of the point indicates the <span style="color:#854798">year</span>
+of the monthly average.</p>
+<p>We can see that near <span style="color:#854798">March and
+October</span>, the monthly average PM2.5 concentrations are <span
+style="color:#854798">lower</span>. On the other hand, near
+<span Style="color:#854798">July and February&lt;/span?, the monthly
+average PM2.5 concentrations are <span
+style="color:#854798">higher</span>.</p>
+<h2 class="tabset" data-width="700" id="column-2">Column</h2>
+<h3 id="section-10"></h3>
+<p>```{r setup2} mon&lt;-c(1:12) mon&lt;-as.character(mon)</p>
+<p>pm251601&lt;-filter(pm2516,startsWith(Date,“01”))
+pm251602&lt;-filter(pm2516,startsWith(Date,“02”))
+pm251603&lt;-filter(pm2516,startsWith(Date,“03”))
+pm251604&lt;-filter(pm2516,startsWith(Date,“04”))
+pm251605&lt;-filter(pm2516,startsWith(Date,“05”))
+pm251606&lt;-filter(pm2516,startsWith(Date,“06”))
+pm251607&lt;-filter(pm2516,startsWith(Date,“07”))
+pm251608&lt;-filter(pm2516,startsWith(Date,“08”))
+pm251609&lt;-filter(pm2516,startsWith(Date,“09”))
+pm251610&lt;-filter(pm2516,startsWith(Date,“10”))
+pm251611&lt;-filter(pm2516,startsWith(Date,“11”))
+pm251612&lt;-filter(pm2516,startsWith(Date,“12”))</p>
+<p>pm251601m&lt;-mean(pm251601<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm251602m&lt;-mean(pm251602$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251603m&lt;-mean(pm251603<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251604m&lt;-mean(pm251604$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251605m&lt;-mean(pm251605<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251606m&lt;-mean(pm251606$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251607m&lt;-mean(pm251607<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251608m&lt;-mean(pm251608$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251609m&lt;-mean(pm251609<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251610m&lt;-mean(pm251610$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251611m&lt;-mean(pm251611<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251612m&lt;-mean(pm251612$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm251701&lt;-filter(pm2517,startsWith(Date,“01”))
+pm251702&lt;-filter(pm2517,startsWith(Date,“02”))
+pm251703&lt;-filter(pm2517,startsWith(Date,“03”))
+pm251704&lt;-filter(pm2517,startsWith(Date,“04”))
+pm251705&lt;-filter(pm2517,startsWith(Date,“05”))
+pm251706&lt;-filter(pm2517,startsWith(Date,“06”))
+pm251707&lt;-filter(pm2517,startsWith(Date,“07”))
+pm251708&lt;-filter(pm2517,startsWith(Date,“08”))
+pm251709&lt;-filter(pm2517,startsWith(Date,“09”))
+pm251710&lt;-filter(pm2517,startsWith(Date,“10”))
+pm251711&lt;-filter(pm2517,startsWith(Date,“11”))
+pm251712&lt;-filter(pm2517,startsWith(Date,“12”))</p>
+<p>pm251701m&lt;-mean(pm251701<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm251702m&lt;-mean(pm251702$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251703m&lt;-mean(pm251703<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251704m&lt;-mean(pm251704$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251705m&lt;-mean(pm251705<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251706m&lt;-mean(pm251706$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251707m&lt;-mean(pm251707<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251708m&lt;-mean(pm251708$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251709m&lt;-mean(pm251709<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251710m&lt;-mean(pm251710$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251711m&lt;-mean(pm251711<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251712m&lt;-mean(pm251712$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm251801&lt;-filter(pm2518,startsWith(Date,“01”))
+pm251802&lt;-filter(pm2518,startsWith(Date,“02”))
+pm251803&lt;-filter(pm2518,startsWith(Date,“03”))
+pm251804&lt;-filter(pm2518,startsWith(Date,“04”))
+pm251805&lt;-filter(pm2518,startsWith(Date,“05”))
+pm251806&lt;-filter(pm2518,startsWith(Date,“06”))
+pm251807&lt;-filter(pm2518,startsWith(Date,“07”))
+pm251808&lt;-filter(pm2518,startsWith(Date,“08”))
+pm251809&lt;-filter(pm2518,startsWith(Date,“09”))
+pm251810&lt;-filter(pm2518,startsWith(Date,“10”))
+pm251811&lt;-filter(pm2518,startsWith(Date,“11”))
+pm251812&lt;-filter(pm2518,startsWith(Date,“12”))</p>
+<p>pm251801m&lt;-mean(pm251801<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm251802m&lt;-mean(pm251802$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251803m&lt;-mean(pm251803<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251804m&lt;-mean(pm251804$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251805m&lt;-mean(pm251805<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251806m&lt;-mean(pm251806$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251807m&lt;-mean(pm251807<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251808m&lt;-mean(pm251808$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251809m&lt;-mean(pm251809<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251810m&lt;-mean(pm251810$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251811m&lt;-mean(pm251811<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251812m&lt;-mean(pm251812$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm251901&lt;-filter(pm2519,startsWith(Date,“01”))
+pm251902&lt;-filter(pm2519,startsWith(Date,“02”))
+pm251903&lt;-filter(pm2519,startsWith(Date,“03”))
+pm251904&lt;-filter(pm2519,startsWith(Date,“04”))
+pm251905&lt;-filter(pm2519,startsWith(Date,“05”))
+pm251906&lt;-filter(pm2519,startsWith(Date,“06”))
+pm251907&lt;-filter(pm2519,startsWith(Date,“07”))
+pm251908&lt;-filter(pm2519,startsWith(Date,“08”))
+pm251909&lt;-filter(pm2519,startsWith(Date,“09”))
+pm251910&lt;-filter(pm2519,startsWith(Date,“10”))
+pm251911&lt;-filter(pm2519,startsWith(Date,“11”))
+pm251912&lt;-filter(pm2519,startsWith(Date,“12”))</p>
+<p>pm251901m&lt;-mean(pm251901<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm251902m&lt;-mean(pm251902$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251903m&lt;-mean(pm251903<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251904m&lt;-mean(pm251904$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251905m&lt;-mean(pm251905<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251906m&lt;-mean(pm251906$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251907m&lt;-mean(pm251907<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251908m&lt;-mean(pm251908$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251909m&lt;-mean(pm251909<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251910m&lt;-mean(pm251910$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm251911m&lt;-mean(pm251911<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm251912m&lt;-mean(pm251912$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm252001&lt;-filter(pm2520,startsWith(Date,“01”))
+pm252002&lt;-filter(pm2520,startsWith(Date,“02”))
+pm252003&lt;-filter(pm2520,startsWith(Date,“03”))
+pm252004&lt;-filter(pm2520,startsWith(Date,“04”))
+pm252005&lt;-filter(pm2520,startsWith(Date,“05”))
+pm252006&lt;-filter(pm2520,startsWith(Date,“06”))
+pm252007&lt;-filter(pm2520,startsWith(Date,“07”))
+pm252008&lt;-filter(pm2520,startsWith(Date,“08”))
+pm252009&lt;-filter(pm2520,startsWith(Date,“09”))
+pm252010&lt;-filter(pm2520,startsWith(Date,“10”))
+pm252011&lt;-filter(pm2520,startsWith(Date,“11”))
+pm252012&lt;-filter(pm2520,startsWith(Date,“12”))</p>
+<p>pm252001m&lt;-mean(pm252001<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm252002m&lt;-mean(pm252002$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252003m&lt;-mean(pm252003<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252004m&lt;-mean(pm252004$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252005m&lt;-mean(pm252005<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252006m&lt;-mean(pm252006$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252007m&lt;-mean(pm252007<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252008m&lt;-mean(pm252008$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252009m&lt;-mean(pm252009<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252010m&lt;-mean(pm252010$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252011m&lt;-mean(pm252011<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252012m&lt;-mean(pm252012$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm252101&lt;-filter(pm2521,startsWith(Date,“01”))
+pm252102&lt;-filter(pm2521,startsWith(Date,“02”))
+pm252103&lt;-filter(pm2521,startsWith(Date,“03”))
+pm252104&lt;-filter(pm2521,startsWith(Date,“04”))
+pm252105&lt;-filter(pm2521,startsWith(Date,“05”))
+pm252106&lt;-filter(pm2521,startsWith(Date,“06”))
+pm252107&lt;-filter(pm2521,startsWith(Date,“07”))
+pm252108&lt;-filter(pm2521,startsWith(Date,“08”))
+pm252109&lt;-filter(pm2521,startsWith(Date,“09”))
+pm252110&lt;-filter(pm2521,startsWith(Date,“10”))
+pm252111&lt;-filter(pm2521,startsWith(Date,“11”))
+pm252112&lt;-filter(pm2521,startsWith(Date,“12”))</p>
+<p>pm252101m&lt;-mean(pm252101<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm252102m&lt;-mean(pm252102$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252103m&lt;-mean(pm252103<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252104m&lt;-mean(pm252104$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252105m&lt;-mean(pm252105<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252106m&lt;-mean(pm252106$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252107m&lt;-mean(pm252107<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252108m&lt;-mean(pm252108$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252109m&lt;-mean(pm252109<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252110m&lt;-mean(pm252110$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252111m&lt;-mean(pm252111<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252112m&lt;-mean(pm252112$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm252201&lt;-filter(pm2522,startsWith(Date,“01”))
+pm252202&lt;-filter(pm2522,startsWith(Date,“02”))
+pm252203&lt;-filter(pm2522,startsWith(Date,“03”))
+pm252204&lt;-filter(pm2522,startsWith(Date,“04”))
+pm252205&lt;-filter(pm2522,startsWith(Date,“05”))
+pm252206&lt;-filter(pm2522,startsWith(Date,“06”))
+pm252207&lt;-filter(pm2522,startsWith(Date,“07”))
+pm252208&lt;-filter(pm2522,startsWith(Date,“08”))
+pm252209&lt;-filter(pm2522,startsWith(Date,“09”))
+pm252210&lt;-filter(pm2522,startsWith(Date,“10”))
+pm252211&lt;-filter(pm2522,startsWith(Date,“11”))
+pm252212&lt;-filter(pm2522,startsWith(Date,“12”))</p>
+<p>pm252201m&lt;-mean(pm252201<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm252202m&lt;-mean(pm252202$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252203m&lt;-mean(pm252203<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252204m&lt;-mean(pm252204$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252205m&lt;-mean(pm252205<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252206m&lt;-mean(pm252206$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252207m&lt;-mean(pm252207<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252208m&lt;-mean(pm252208$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252209m&lt;-mean(pm252209<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252210m&lt;-mean(pm252210$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252211m&lt;-mean(pm252211<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252212m&lt;-mean(pm252212$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm252301&lt;-filter(pm2523,startsWith(Date,“01”))
+pm252302&lt;-filter(pm2523,startsWith(Date,“02”))
+pm252303&lt;-filter(pm2523,startsWith(Date,“03”))
+pm252304&lt;-filter(pm2523,startsWith(Date,“04”))
+pm252305&lt;-filter(pm2523,startsWith(Date,“05”))
+pm252306&lt;-filter(pm2523,startsWith(Date,“06”))
+pm252307&lt;-filter(pm2523,startsWith(Date,“07”))
+pm252308&lt;-filter(pm2523,startsWith(Date,“08”))
+pm252309&lt;-filter(pm2523,startsWith(Date,“09”))
+pm252310&lt;-filter(pm2523,startsWith(Date,“10”))
+pm252311&lt;-filter(pm2523,startsWith(Date,“11”))
+pm252312&lt;-filter(pm2523,startsWith(Date,“12”))</p>
+<p>pm252301m&lt;-mean(pm252301<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm252302m&lt;-mean(pm252302$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252303m&lt;-mean(pm252303<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252304m&lt;-mean(pm252304$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252305m&lt;-mean(pm252305<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252306m&lt;-mean(pm252306$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252307m&lt;-mean(pm252307<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252308m&lt;-mean(pm252308$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252309m&lt;-mean(pm252309<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252310m&lt;-mean(pm252310$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252311m&lt;-mean(pm252311<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252312m&lt;-mean(pm252312$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm252401&lt;-filter(pm2524,startsWith(Date,“01”))
+pm252402&lt;-filter(pm2524,startsWith(Date,“02”))
+pm252403&lt;-filter(pm2524,startsWith(Date,“03”))
+pm252404&lt;-filter(pm2524,startsWith(Date,“04”))
+pm252405&lt;-filter(pm2524,startsWith(Date,“05”))
+pm252406&lt;-filter(pm2524,startsWith(Date,“06”))
+pm252407&lt;-filter(pm2524,startsWith(Date,“07”))
+pm252408&lt;-filter(pm2524,startsWith(Date,“08”))
+pm252409&lt;-filter(pm2524,startsWith(Date,“09”))
+pm252410&lt;-filter(pm2524,startsWith(Date,“10”))
+pm252411&lt;-filter(pm2524,startsWith(Date,“11”))
+pm252412&lt;-filter(pm2524,startsWith(Date,“12”))</p>
+<p>pm252401m&lt;-mean(pm252401<span class="math inline">$`Daily Mean
+PM2.5 Concentration`)
+pm252402m&lt;-mean(pm252402$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252403m&lt;-mean(pm252403<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252404m&lt;-mean(pm252404$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252405m&lt;-mean(pm252405<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252406m&lt;-mean(pm252406$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252407m&lt;-mean(pm252407<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252408m&lt;-mean(pm252408$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252409m&lt;-mean(pm252409<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252410m&lt;-mean(pm252410$</span><code>Daily Mean PM2.5 Concentration</code>)
+pm252411m&lt;-mean(pm252411<span class="math inline">$`Daily Mean PM2.5
+Concentration`)
+pm252412m&lt;-mean(pm252412$</span><code>Daily Mean PM2.5 Concentration</code>)</p>
+<p>pm2516mm&lt;-data.frame(year = “2016”,month = mon,mm=
+c(pm251601m,pm251602m,pm251603m,pm251604m,pm251605m,pm251606m,pm251607m,pm251608m,pm251609m,pm251610m,pm251611m,pm251612m))
+pm2517mm&lt;-data.frame(year = “2017”,month = mon,mm=
+c(pm251701m,pm251702m,pm251703m,pm251704m,pm251705m,pm251706m,pm251707m,pm251708m,pm251709m,pm251710m,pm251711m,pm251712m))
+pm2518mm&lt;-data.frame(year = “2018”,month = mon,mm=
+c(pm251801m,pm251802m,pm251803m,pm251804m,pm251805m,pm251806m,pm251807m,pm251808m,pm251809m,pm251810m,pm251811m,pm251812m))
+pm2519mm&lt;-data.frame(year = “2019”,month = mon,mm=
+c(pm251901m,pm251902m,pm251903m,pm251904m,pm251905m,pm251906m,pm251907m,pm251908m,pm251909m,pm251910m,pm251911m,pm251912m))
+pm2520mm&lt;-data.frame(year = “2020”,month = mon,mm=
+c(pm252001m,pm252002m,pm252003m,pm252004m,pm252005m,pm252006m,pm252007m,pm252008m,pm252009m,pm252010m,pm252011m,pm252012m))
+pm2521mm&lt;-data.frame(year = “2021”,month = mon,mm=
+c(pm252101m,pm252102m,pm252103m,pm252104m,pm252105m,pm252106m,pm252107m,pm252108m,pm252109m,pm252110m,pm252111m,pm252112m))
+pm2522mm&lt;-data.frame(year = “2022”,month = mon,mm=
+c(pm252201m,pm252202m,pm252203m,pm252204m,pm252205m,pm252206m,pm252207m,pm252208m,pm252209m,pm252210m,pm252211m,pm252212m))
+pm2523mm&lt;-data.frame(year = “2023”,month = mon,mm=
+c(pm252301m,pm252302m,pm252303m,pm252304m,pm252305m,pm252306m,pm252307m,pm252308m,pm252309m,pm252310m,pm252311m,pm252312m))
+pm2524mm&lt;-data.frame(year = “2024”,month = mon,mm=
+c(pm252401m,pm252402m,pm252403m,pm252404m,pm252405m,pm252406m,pm252407m,pm252408m,pm252409m,pm252410m,pm252411m,pm252412m))</p>
+<p>pm25mm&lt;-bind_rows(pm2516mm,pm2517mm,pm2518mm,pm2519mm,pm2520mm,pm2521mm,pm2522mm,pm2523mm,pm2524mm,)</p>
+<p>pm25mm<span
+class="math inline"><em>m</em><em>o</em><em>n</em><em>t</em><em>h</em> &lt;  − <em>f</em><em>a</em><em>c</em><em>t</em><em>o</em><em>r</em>(<em>p</em><em>m</em>25<em>m</em><em>m</em></span>month,levels
+= mon)</p>
+<pre><code>
+```{r}
+ggplot(pm25mm,aes(x=month,y=mm, col = year))+
+  geom_point()+
+  labs(y = &quot;Monthly Mean&quot;, x = &quot;Month&quot;, col = &quot;Year&quot;)+
+  coord_cartesian(ylim = c(5,13))
+  </code></pre>
+<h1 id="us-map">US Map</h1>
+<h2 id="column-data-width-300-2">Column {data-width = 300}</h2>
+<h3 id="analysis-2">Analysis</h3>
+<p>Here the graph shows the <span style="color:#854798">yearly average
+PM2.5</span> in a <span style="color:#854798">map</span> form.</p>
+<p>We can see that there are <span style="color:#854798">very low</span>
+PM2.5 readings around the <span style="color:#854798">coast</span>. This
+may be due to the ocean stabilizing the PM2.5 in the atmosphere.</p>
+<p>There are also low PM2.5 readings in the <span
+style="color:#854798">mountainous regions</span>. This may be due to
+<span style="color:#854798">low human acivity</span> in these areas.</p>
+<h2 id="column-data-width-700-1">Column {data-width = 700}</h2>
+<h3 id="section-11"></h3>
+<pre class="{r}"><code>for (i in 1:51) {
+  if (i %in% c(3, 4)) next
+  assign(paste0(&quot;pmstate&quot;, i), read_csv(paste0(&quot;ad_viz_plotval_data(&quot;, i, &quot;).csv&quot;)))
+}
+
+for (i in setdiff(1:51, c(3, 4))) {
+  df_name &lt;- paste0(&quot;pmstate&quot;, i)
+  df &lt;- get(df_name)
+  df$`Site ID` &lt;- as.character(df$`Site ID`)
+  assign(df_name, df)
+}
+
+for (i in setdiff(1:51, c(3, 4))) {
+  df_name &lt;- paste0(&quot;pmstate&quot;, i)
+  df &lt;- get(df_name)
+  df$`State FIPS Code` &lt;- as.character(df$`Site ID`)
+  assign(df_name, df)
+}
+
+df_names &lt;- paste0(&quot;pmstate&quot;, setdiff(1:51, c(3, 4)))  
+pm_list &lt;- mget(df_names)
+
+pmstateall &lt;- bind_rows(pm_list, .id = &quot;source&quot;)
+
+pmstateallave &lt;- pmstateall %&gt;%
+  group_by(`Site Longitude`,`Site Latitude`) %&gt;%
+  summarize(avg_pm25 = mean(`Daily Mean PM2.5 Concentration`, na.rm = TRUE))
+pmstateallave&lt;-pmstateallave[-601,]
+
+county_map &lt;- map_data(&quot;county&quot;)
+
+pm_plot_data &lt;- pmstateallave %&gt;%
+  rename(lon = `Site Longitude`, lat = `Site Latitude`)
+
+gg1&lt;-ggplot() +
+  geom_polygon(data = county_map, aes(x = long, y = lat, group = group),
+               fill = &quot;grey95&quot;, color = &quot;white&quot;) +
+  geom_point(data = pm_plot_data, aes(x = lon, y = lat, color = avg_pm25), size = 2) +
+  scale_color_viridis_c(option = &quot;inferno&quot;, name = &quot;Avg PM2.5&quot;) +
+  coord_fixed(1.3) +
+  theme_minimal()
+
+ggplotly(gg1)</code></pre>
+<h1 id="temperature-1">Temperature</h1>
+<h2 data-width="300" id="column-3">Column</h2>
+<h3 id="section-12"></h3>
+<p>Here is a plot of the <span style="color:#854798">monthly average
+temperature</span> in the <span style="color:#854798">Dayton area</span>
+with the <span style="color:#854798">monthly average PM2.5
+concentration</span> in the atmosphere.</p>
+<p>There is<span style="color:#854798"> no significant
+correlation</span> between monthly average temperature and monthly
+average PM2.5 concentration.</p>
+<h2 data-width="700" id="column-4">Column</h2>
+<h3 id="section-13"></h3>
+<pre class="{r}"><code>pmtemp&lt;-pm25mm
+pmtemp$Temperature&lt;-(temp$temp/100)
+pmtemp&lt;-pmtemp[-90,]
+ggplot(pmtemp,aes(x=Temperature,y=mm))+
+  geom_point(color=&quot;#854798&quot;)+
+  labs(x=&quot;Monthly Average Temperature (C)&quot;, y=&quot;Monthly Average PM2.5 Concentration&quot;)</code></pre>
+<h1 id="precipitation-1">Precipitation</h1>
+<h2 data-width="300" id="column-5">Column</h2>
+<h3 id="section-14"></h3>
+<p>Here is a plot of the <span style="color:#854798">monthly average
+precipitation</span> in the <span style="color:#854798">Dayton
+area</span> with the <span style="color:#854798">monthly average PM2.5
+concentration</span> in the atmosphere.</p>
+<p>There is a very <span style="color:#854798"> small positive
+correlation</span> between monthly average precipitation and monthly
+average PM2.5 concentration.</p>
+<h2 data-width="700" id="column-6">Column</h2>
+<h3 id="section-15"></h3>
+<pre class="{r}"><code>pmprec&lt;-pm25mm
+pmprec$Precipitation&lt;-(prec$prv)
+pmprec&lt;-pmprec[-90,]
+ggplot(pmprec,aes(x=Precipitation,y=mm))+
+  geom_point(color=&quot;#854798&quot;)+
+  labs(x=&quot;Monthly Average Precipitation (μm)&quot;, y=&quot;Monthly Average PM2.5 Concentration&quot;)</code></pre>
+<h1 id="conclusion">Conclusion</h1>
+<h2 data-width="500" id="column-7">Column</h2>
+<h3 id="summary">Summary</h3>
+<p>This project <span style="color:#854798">did not</span> show many
+correlations between different factors and PM2.5 concentrations in the
+air. There was <span style="color:#854798">low to no correlation</span>
+between <span style="color:#854798">temperature</span>,<span
+style="color:#854798"> precipitation</span>, or<span
+style="color:#854798"> year</span> with PM2.5 concentration in the
+Atmosphere. The only graph that gave any correlational data was <span
+style="color:#854798">the map</span>. On the map, there is a lower PM2.5
+in regions with <span style="color:#854798">lower human activity</span>.
+There is also a lower PM2.5 concentration near <span
+style="color:#854798">the coastlines</span>.</p>
+<h2 data-width="500" id="column-8">Column</h2>
+<h3 id="importance">Importance</h3>
+<p>While there were not many correlations in the factors chosen, this
+project can still provide some important information to environmental
+agencies. This project showed some factors that do not affect PM2.5
+concentrations in the air, so that can narrow the search for factors
+that do affect it.</p>
+<h1 id="about">About</h1>
+<h2 data-width="400" id="column-9">Column</h2>
+<h3 id="section-16"></h3>
+<p>Hi! my name is <span style="color:#854798">Jamie Zhang</span>, and I
+am a freshman at the University of Dayton. I am pursuing a degree in
+Finance, Statistic, and Mathematics. I chose the topic of particulate
+matter, because of my interest in environmental sciences. My interest
+stems from my childhood dinner conversations about environmental
+science. It’s a bit of a weird topic to cover at the dinner table, but
+since my mother is a climatologist, it is understandable.</p>
+<p>My personal passion is learning. I love learning all kinds of things
+such as languages, sciences, and much more! However, the most consistent
+passion I have is mathematics. I love everything about learning math.
+That is why I chose such math heavy majors.</p>
+<h2 class="tabset" data-width="600" id="column-10">Column</h2>
+<h3 id="a-photo-of-me-and-my-family">A photo of me and my family</h3>
+<p>
+<strong>from left to right: my mom (Shuang-ye), me (Jamie), my sister
+(Coco), my dad (Yu)</strong>
+</p>
+<p style="text-align:center;">
+<img src="me.jpg" width="300px">
+</p>
+<h3 id="k">K</h3>
+<p>
+<strong>A photo of Kiko(right) looking dissappointingly upon her
+brother, Hobbes(left).</strong>
+</p>
+<p style="text-align:center;">
+<img src="cat1(2).jpg" width="300px">
+</p>
+<h3 id="i">I</h3>
+<p>A photo of Pebbles! (Beebee for short) I literally found her in a
+dumpster.</p>
+<pre class="{r}"><code>knitr::include_graphics(&quot;cat2.jpg&quot;)</code></pre>
+<h3 id="t">T</h3>
+<p>Here is a photo of Munchie being silly! She’s our first cat!</p>
+<pre class="{r}"><code>knitr::include_graphics(&quot;cat4.jpg&quot;)</code></pre>
+<h3 id="t-1">T</h3>
+<p>A photo of Eggsy. He is the scaredy cat of the family. A rare photo
+where he’s not running away!</p>
+<pre class="{r}"><code>knitr::include_graphics(&quot;cat5.jpg&quot;)</code></pre>
+<h3 id="i-1">I</h3>
+<p>More Kiko and Hobbes!</p>
+<pre class="{r}"><code>knitr::include_graphics(&quot;cat3.jpg&quot;)</code></pre>
+<h3 id="e">E</h3>
+<p>Munchie and Doki are the best of buds… Just kidding, they hate each
+other. This was the only time they weren’t fighting.</p>
+<pre class="{r}"><code>knitr::include_graphics(&quot;cat6.jpg&quot;)</code></pre>
+<h3 id="s">S</h3>
+<p>Conclusion:</p>
+<p>I think my family has too many cats…</p>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"93c2619a5d66000f","version":"2025.4.0-1-g37f21b1","r":1,"token":"0357a45f23a943f08700f7f9af191ee6","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}' crossorigin="anonymous"></script>
+</body>
+</html>
